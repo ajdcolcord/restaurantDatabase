@@ -1,7 +1,5 @@
 DROP DATABASE IF EXISTS restaurantDB;
-
 CREATE DATABASE IF NOT EXISTS restaurantDB;
-
 USE restaurantDB;
 
 -- ---------------------------------------------
@@ -57,7 +55,7 @@ CREATE TABLE menu
 (
 	menu_id			INT AUTO_INCREMENT 	PRIMARY KEY,
     restaurant_id	INT,
-    menu_type		ENUM('breakfast', 'lunch', 'dinner', 'dessert') NOT NULL,
+    menu_type		ENUM('breakfast', 'lunch', 'dinner', 'dessert') NOT NULL, # consider seperate table
 
 	CONSTRAINT menu_restaurant_id_fk
 		FOREIGN KEY (restaurant_id) REFERENCES restaurants (restaurant_id)
