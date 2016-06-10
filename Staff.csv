@@ -1,0 +1,7 @@
+SSN,restaurant_id,staff_name,address,phone_number,salary,start_date,role
+000000000,	1,	Joe Barn,	1 Park Ave,			,	128347.12,	,	owner
+110010100,	1,	Bobby B,	4123 Array Way,	1234567890,90435.10,,				manager
+900242521,	1,	Amy Mary,	98 Elm Street,	,8900.00,					,bus part time
+552425678,	2,	Jacob Ladder,	88 One Lane,	1987654321,41234.00,				,chef
+876767777,	2,	Orange Peel,	3 Main Street,	909897867,12455.00,				,bartender
+878674534,	1,	Richard Box,	4 South Ave,	,9822.00,					,server
