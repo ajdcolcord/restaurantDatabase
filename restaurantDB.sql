@@ -1,5 +1,7 @@
 DROP DATABASE IF EXISTS restaurantDB;
+
 CREATE DATABASE IF NOT EXISTS restaurantDB;
+
 USE restaurantDB;
 
 -- ---------------------------------------------
@@ -55,7 +57,7 @@ CREATE TABLE menu
 (
 	menu_id			INT AUTO_INCREMENT 	PRIMARY KEY,
     restaurant_id	INT,
-    menu_type		ENUM('breakfast', 'lunch', 'dinner', 'dessert') NOT NULL, # consider seperate table
+    menu_type		ENUM('breakfast', 'lunch', 'dinner', 'dessert') NOT NULL,
 
 	CONSTRAINT menu_restaurant_id_fk
 		FOREIGN KEY (restaurant_id) REFERENCES restaurants (restaurant_id)
@@ -67,15 +69,32 @@ CREATE TABLE menu
 DROP TABLE IF EXISTS menu_item;
 CREATE TABLE menu_item
 (
-	menu_item_id	INT	AUTO_INCREMENT	PRIMARY KEY,
-    menu_id			INT,
-    item_name		VARCHAR(50) NOT NULL,
+	menu_item_id 	INT AUTO_INCREMENT PRIMARY KEY,
+    item_name		VARCHAR(50)
+);
+-- ---------------------------------------------
+
+
+-- ---------------------------------------------
+DROP TABLE IF EXISTS menu_contents;
+CREATE TABLE menu_contents
+(
+	menu_id 		INT,
+    menu_item_id	INT,
     price			FLOAT(5, 2),
     
-    CONSTRAINT menu_item_menu_id_fk
+    CONSTRAINT menu_contents_pk
+		PRIMARY KEY (menu_id, menu_item_id),
+	
+    CONSTRAINT menu_contents_menu_id_fk
 		FOREIGN KEY (menu_id) REFERENCES menu (menu_id)
-        ON DELETE SET NULL ON UPDATE CASCADE
+        ON DELETE CASCADE ON UPDATE CASCADE,
+        
+	CONSTRAINT menu_contents_menu_item_fk
+		FOREIGN KEY (menu_item_id) REFERENCES menu_item (menu_item_id)
+        ON DELETE CASCADE ON UPDATE CASCADE
 );
+-- ---------------------------------------------
 
 
 -- ---------------------------------------------
@@ -118,7 +137,7 @@ CREATE TABLE ingredient
 DROP TABLE IF EXISTS staff;
 CREATE TABLE staff
 (
-	SSN				INT(9) ZEROFILL 	PRIMARY KEY,
+	SSN				INT(9) ZEROFILL,
     restaurant_id	INT,
     staff_name		VARCHAR(50) 		NOT NULL,
     address			VARCHAR(100),
@@ -126,6 +145,9 @@ CREATE TABLE staff
     salary			FLOAT(8, 2)			NOT NULL,
     start_date		TIMESTAMP 			DEFAULT CURRENT_TIMESTAMP(),
     role			VARCHAR(50),
+    
+    CONSTRAINT staff_pk
+		PRIMARY KEY (SSN, restaurant_id),
     
     CONSTRAINT staff_restaurant_id_fk
 		FOREIGN KEY (restaurant_id) REFERENCES restaurants (restaurant_id)
