@@ -11,6 +11,8 @@ BEGIN
     SELECT 
 		r.restaurant_name, 
 		r.address, 
+        o.owner_ssn,
+        s.staff_name AS restaurant_owner,
 		r.price_range, 
 		AVG(rat.rating) AS rating, 
 		typ.type_name
@@ -20,12 +22,23 @@ BEGIN
 		ON r.restaurant_id = rat.restaurant_id
     LEFT JOIN restaurant_type typ
 		ON r.restaurant_id = typ.restaurant_id
-    WHERE restaurant_name = in_restaurant_name
-    GROUP BY r.restaurant_id, r.restaurant_name, r.address, r.price_range, typ.type_name;
+	LEFT JOIN owns o
+		ON r.restaurant_id = o.restaurant_id
+	LEFT JOIN staff s
+		ON o.owner_ssn = s.SSN
+    WHERE 
+		restaurant_name = in_restaurant_name
+    GROUP BY 
+		r.restaurant_id, 
+        r.restaurant_name, 
+        r.address, 
+        r.price_range, 
+        typ.type_name, 
+        s.staff_name;
 END$$
 DELIMITER ;
 
-CALL view_restaurant("Panera Bread");
+CALL view_restaurant("Dunkin Donuts");
 
 -- ------------------------------------------------------------
 
@@ -218,7 +231,7 @@ DELIMITER ;
 
 SELECT * FROM menu_item;
 
-CALL add_menu_item(4, "Chicken Caesar Salad", 10.55);
+CALL add_menu_item(1, "Chicken Caesar Salad", 100.55);
 
 -- ------------------------------------------------------------
 
@@ -354,4 +367,114 @@ END$$
 DELIMITER ;
 
 CALL remove_ingredient(1, "Pickles");
+-- ------------------------------------------------------------
+
+
+
+
+
+
+
+-- #### UPDATE PROCEDURES ##########################################
+-- Update a restaurant's price range   ---------------------
+DROP PROCEDURE IF EXISTS update_restaurant_price_range;
+DELIMITER $$
+CREATE PROCEDURE 
+	update_restaurant_price_range(
+			IN in_restaurant_id INT(9), 
+            IN in_price_range ENUM('1', '2', '3', '4', '5')
+	)
+BEGIN
+	UPDATE restaurants
+	SET price_range = in_price_range
+	WHERE restaurant_id = in_restaurant_id;
+END$$
+DELIMITER ;
+
+CALL update_restaurant_price_range(3, '2');
+-- ------------------------------------------------------------
+
+
+
+-- Update a restaurant's address   ---------------------
+DROP PROCEDURE IF EXISTS update_restaurant_address;
+DELIMITER $$
+CREATE PROCEDURE 
+	update_restaurant_address(
+			IN in_restaurant_id INT(9), 
+            IN in_address VARCHAR(100)
+	)
+BEGIN
+	UPDATE restaurants
+	SET address = in_address
+	WHERE restaurant_id = in_restaurant_id;
+END$$
+DELIMITER ;
+
+CALL update_restaurant_address(3, '21 Huntington Ave');
+-- ------------------------------------------------------------
+
+
+-- Update a menu offering's name and price   ---------------------
+DROP PROCEDURE IF EXISTS update_menu_offering;
+DELIMITER $$
+CREATE PROCEDURE 
+	update_menu_offering(
+        IN in_menu_item_id INT,
+        IN in_name VARCHAR(50),
+        IN in_price FLOAT(5, 2)
+	)
+BEGIN
+	UPDATE menu_contents
+	SET price = in_price
+	WHERE menu_item_id = in_menu_item_id;
+    
+    UPDATE menu_item
+    SET item_name = in_name
+    WHERE menu_item_id = in_menu_item_id;
+END$$
+DELIMITER ;
+
+CALL update_menu_offering(1, 'Fried Egg', 2.00);
+-- ------------------------------------------------------------
+
+
+
+-- Update a recipe's instructions   ---------------------
+DROP PROCEDURE IF EXISTS update_recipe_instructions;
+DELIMITER $$
+CREATE PROCEDURE 
+	update_recipe_instructions(
+			IN in_recipe_id INT, 
+            IN in_instructions VARCHAR(60000)
+	)
+BEGIN
+	UPDATE recipe
+	SET instructions = in_instructions
+	WHERE recipe_id = in_recipe_id;
+END$$
+DELIMITER ;
+
+CALL update_recipe_instructions(1, 'Toast bread. Place the chicken on the bread with lettuce tomato and pickles.');
+-- ------------------------------------------------------------
+
+
+-- Update an ingredient amount   ---------------------
+DROP PROCEDURE IF EXISTS update_ingredient_amount;
+DELIMITER $$
+CREATE PROCEDURE 
+	update_ingredient_amount(
+			IN in_recipe_id INT, 
+            IN in_ingredient_name VARCHAR(50),
+            IN in_amount INT
+	)
+BEGIN
+	UPDATE ingredient
+	SET amount = in_amount
+	WHERE recipe_id = in_recipe_id
+    AND ingredient_name = in_ingredient_name;
+END$$
+DELIMITER ;
+
+CALL update_ingredient_amount(1, 'Tomato', 1);
 -- ------------------------------------------------------------

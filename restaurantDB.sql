@@ -141,7 +141,7 @@ CREATE TABLE staff
     restaurant_id	INT,
     staff_name		VARCHAR(50) 		NOT NULL,
     address			VARCHAR(100),
-    phone_number	INT(10),
+    phone_number	INT(11),
     salary			FLOAT(8, 2)			NOT NULL,
     start_date		TIMESTAMP 			DEFAULT CURRENT_TIMESTAMP(),
     role			VARCHAR(50),
@@ -181,7 +181,7 @@ CREATE TABLE owns
     restaurant_id	INT,
     
     CONSTRAINT owns_pk
-		PRIMARY KEY (owner_ssn, restaurant_id),
+		PRIMARY KEY (restaurant_id),
         
 	CONSTRAINT owns_owner_ssn_fk
 		FOREIGN KEY (owner_ssn) REFERENCES staff (SSN)
