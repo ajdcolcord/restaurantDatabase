@@ -6,7 +6,7 @@ USE restaurantDB;
 DROP PROCEDURE IF EXISTS view_restaurant;
 DELIMITER $$
 CREATE PROCEDURE 
-	view_restaurant(IN in_restaurant_name VARCHAR(50))
+	view_restaurant(IN in_restaurant_id INT)
 BEGIN
     SELECT 
 		r.restaurant_name, 
@@ -27,7 +27,7 @@ BEGIN
 	LEFT JOIN staff s
 		ON o.owner_ssn = s.SSN
     WHERE 
-		restaurant_name = in_restaurant_name
+		r.restaurant_id = in_restaurant_id
     GROUP BY 
 		r.restaurant_id, 
         r.restaurant_name, 
@@ -38,7 +38,7 @@ BEGIN
 END$$
 DELIMITER ;
 
-CALL view_restaurant("Dunkin Donuts");
+CALL view_restaurant(1);
 
 -- ------------------------------------------------------------
 
@@ -46,20 +46,17 @@ CALL view_restaurant("Dunkin Donuts");
 DROP PROCEDURE IF EXISTS view_restaurant_menus;
 DELIMITER $$
 CREATE PROCEDURE 
-	view_restaurant_menus(IN in_restaurant_name VARCHAR(50))
+	view_restaurant_menus(IN in_restaurant_id INT)
 BEGIN
 	SELECT menu_id, menu_type
     FROM menu m
     JOIN restaurants r
     ON r.restaurant_id = m.restaurant_id
-	WHERE r.restaurant_id = (
-		SELECT restaurant_id
-		FROM restaurants
-		WHERE restaurant_name = in_restaurant_name);
+	WHERE r.restaurant_id = in_restaurant_id;
 END$$
 DELIMITER ;
 
-CALL view_restaurant_menus("Panera Bread");
+CALL view_restaurant_menus(1);
 
 -- ------------------------------------------------------------
 
