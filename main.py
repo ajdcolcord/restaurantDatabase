@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from sqlalchemy import create_engine
 from staff import view_restaurant_staff
-from menu import view_restaurant_menus
+from restaurant_menus import view_restaurant_menus
 
 
 def main():

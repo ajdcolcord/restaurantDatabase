@@ -67,7 +67,7 @@ DELIMITER $$
 CREATE PROCEDURE 
 	view_menu(IN in_menu_id INT)
 BEGIN
-	SELECT item_name, price
+	SELECT mi.menu_item_id, item_name, price
     FROM menu m
     JOIN menu_contents mc
     ON m.menu_id = mc.menu_id

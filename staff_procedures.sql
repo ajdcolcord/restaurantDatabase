@@ -119,7 +119,7 @@ BEGIN
 END$$
 DELIMITER ;
 
-CALL remove_staff(543454346, 2);
+CALL remove_staff(823920541, 1);
 -- ------------------------------------------------------------
 
 -- Remove a manager from all relationships  ---------------
