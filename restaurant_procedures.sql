@@ -8,6 +8,7 @@ DELIMITER $$
 CREATE PROCEDURE 
 	view_restaurant(IN in_restaurant_id INT)
 BEGIN
+	START TRANSACTION;
     SELECT 
 		r.restaurant_name, 
 		r.address, 
@@ -35,6 +36,7 @@ BEGIN
         r.price_range, 
         typ.type_name, 
         s.staff_name;
+	COMMIT;
 END$$
 DELIMITER ;
 
@@ -48,11 +50,13 @@ DELIMITER $$
 CREATE PROCEDURE 
 	view_restaurant_menus(IN in_restaurant_id INT)
 BEGIN
+	START TRANSACTION;
 	SELECT menu_id, menu_type
     FROM menu m
     JOIN restaurants r
     ON r.restaurant_id = m.restaurant_id
 	WHERE r.restaurant_id = in_restaurant_id;
+    COMMIT;
 END$$
 DELIMITER ;
 
@@ -67,6 +71,7 @@ DELIMITER $$
 CREATE PROCEDURE 
 	view_menu(IN in_menu_id INT)
 BEGIN
+	START TRANSACTION;
 	SELECT mi.menu_item_id, item_name, price
     FROM menu m
     JOIN menu_contents mc
@@ -74,10 +79,11 @@ BEGIN
     JOIN menu_item mi
     ON mc.menu_item_id = mi.menu_item_id
     WHERE m.menu_id = in_menu_id;
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL view_menu(1);
+-- CALL view_menu(1);
 
 -- ------------------------------------------------------------
 
@@ -88,15 +94,17 @@ DELIMITER $$
 CREATE PROCEDURE 
 	view_recipe(IN in_menu_item_id INT)
 BEGIN
+	START TRANSACTION;
 	SELECT r.recipe_id, recipe_name, instructions
     FROM recipe r
     LEFT JOIN menu_item mi
     ON r.menu_item_id = mi.menu_item_id
     WHERE mi.menu_item_id = in_menu_item_id;
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL view_recipe(5);
+-- CALL view_recipe(5);
 
 -- ------------------------------------------------------------
 
@@ -107,15 +115,17 @@ DELIMITER $$
 CREATE PROCEDURE 
 	view_recipe_ingredients(IN in_recipe_id INT)
 BEGIN
+	START TRANSACTION;
 	SELECT ingredient_name, amount
     FROM ingredient i
     JOIN recipe r
     ON i.recipe_id = r.recipe_id
     WHERE i.recipe_id = in_recipe_id;
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL view_recipe_ingredients(1);
+-- CALL view_recipe_ingredients(1);
 
 -- ------------------------------------------------------------
 
@@ -140,7 +150,8 @@ CREATE PROCEDURE
 	)
 BEGIN
     DECLARE max_restaurant_id INT;
-
+    
+    START TRANSACTION;
 	INSERT INTO restaurants (restaurant_name, address, price_range)
 	VALUES (
 		in_restaurant_name, 
@@ -148,16 +159,16 @@ BEGIN
 		in_price_range
 	);
     
-    
     SET max_restaurant_id = (SELECT MAX(restaurant_id)
 	 						FROM restaurants);
     
     INSERT INTO restaurant_type (restaurant_id, type_name)
     VALUES (max_restaurant_id, in_type_name);
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL add_restaurant("BHOP", "29 Huntington Avenue", 2, "Pizza");
+-- CALL add_restaurant("BHOP", "29 Huntington Avenue", 2, "Pizza");
 
 -- ------------------------------------------------------------
 
@@ -170,15 +181,17 @@ CREATE PROCEDURE
         IN in_rating ENUM('1', '2', '3', '4', '5')
 	)
 BEGIN
+	START TRANSACTION;
 	INSERT INTO restaurant_rating (restaurant_id, rating)
 	VALUES (
 		in_restaurant_id, 
 		in_rating
 	);
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL add_rating(1, 4);
+-- CALL add_rating(1, 4);
 
 -- ------------------------------------------------------------
 
@@ -191,15 +204,17 @@ CREATE PROCEDURE
         IN in_menu_type ENUM('breakfast', 'lunch', 'dinner', 'dessert')
 	)
 BEGIN
+	START TRANSACTION;
 	INSERT INTO menu (restaurant_id, menu_type)
 	VALUES (
 		in_restaurant_id, 
 		in_menu_type
 	);
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL add_menu(7, 'dessert');
+-- CALL add_menu(7, 'dessert');
 
 -- ------------------------------------------------------------
 
@@ -215,6 +230,7 @@ CREATE PROCEDURE
 BEGIN
 	DECLARE max_menu_item_id INT;
     
+    START TRANSACTION;
 	INSERT INTO menu_item (item_name)
 	VALUES (in_item_name);
     
@@ -223,12 +239,12 @@ BEGIN
                             
 	INSERT INTO menu_contents (menu_id, menu_item_id, price)
     VALUES (in_menu_id, max_menu_item_id, in_price);
+    COMMIT;
 END$$
 DELIMITER ;
 
-SELECT * FROM menu_item;
 
-CALL add_menu_item(1, "Chicken Caesar Salad", 100.55);
+-- CALL add_menu_item(1, "Chicken Caesar Salad", 100.55);
 
 -- ------------------------------------------------------------
 
@@ -243,16 +259,18 @@ CREATE PROCEDURE
         IN in_instructions VARCHAR(60000)
 	)
 BEGIN
+	START TRANSACTION;
 	INSERT INTO recipe (menu_item_id, recipe_name, instructions)
 	VALUES (
 		in_menu_item_id, 
 		in_recipe_name,
         in_instructions
 	);
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL add_recipe(5, "Side of Pickles", "2 Pickles");
+-- CALL add_recipe(5, "Side of Pickles", "2 Pickles");
 
 -- ------------------------------------------------------------
 
@@ -267,16 +285,18 @@ CREATE PROCEDURE
         IN in_amount INT
 	)
 BEGIN
+	START TRANSACTION;
 	INSERT INTO ingredient (recipe_id, ingredient_name, amount)
 	VALUES (
 		in_recipe_id, 
 		in_ingredient_name,
         in_amount
 	);
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL add_ingredient(1, "Mustard (tbsp)", 1);
+-- CALL add_ingredient(1, "Mustard (tbsp)", 1);
 
 -- ------------------------------------------------------------
 
@@ -291,13 +311,15 @@ DELIMITER $$
 CREATE PROCEDURE 
 	remove_restaurant(IN in_restaurant_id INT)
 BEGIN
+	START TRANSACTION;
 	DELETE 
     FROM restaurants
     WHERE restaurant_id = in_restaurant_id;
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL remove_restaurant(12);
+-- CALL remove_restaurant(12);
 -- ------------------------------------------------------------
 
 
@@ -307,13 +329,15 @@ DELIMITER $$
 CREATE PROCEDURE 
 	remove_menu(IN in_menu_id INT)
 BEGIN
+	START TRANSACTION;
 	DELETE 
     FROM menu
     WHERE menu_id = in_menu_id;
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL remove_menu(7);
+-- CALL remove_menu(7);
 -- ------------------------------------------------------------
 
 -- Remove a menu item from the given menu id ------------------
@@ -322,13 +346,15 @@ DELIMITER $$
 CREATE PROCEDURE 
 	remove_menu_item(IN in_menu_item_id INT)
 BEGIN
+	START TRANSACTION;
 	DELETE 
     FROM menu_item
     WHERE menu_item_id = in_menu_item_id;
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL remove_menu_item(8);
+-- CALL remove_menu_item(8);
 -- ------------------------------------------------------------
 
 
@@ -338,13 +364,15 @@ DELIMITER $$
 CREATE PROCEDURE 
 	remove_recipe(IN in_recipe_id INT)
 BEGIN
+	START TRANSACTION;
 	DELETE
     FROM recipe
     WHERE recipe_id = in_recipe_id;
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL remove_recipe(3);
+-- CALL remove_recipe(3);
 -- ------------------------------------------------------------
 
 
@@ -355,15 +383,16 @@ DELIMITER $$
 CREATE PROCEDURE 
 	remove_ingredient(IN in_recipe_id INT, IN in_ingredient_name VARCHAR(50))
 BEGIN
+	START TRANSACTION;
 	DELETE
     FROM ingredient
     WHERE recipe_id = in_recipe_id
     AND ingredient_name = in_ingredient_name;
-    
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL remove_ingredient(1, "Pickles");
+-- CALL remove_ingredient(1, "Pickles");
 -- ------------------------------------------------------------
 
 
@@ -382,13 +411,15 @@ CREATE PROCEDURE
             IN in_price_range ENUM('1', '2', '3', '4', '5')
 	)
 BEGIN
+	START TRANSACTION;
 	UPDATE restaurants
 	SET price_range = in_price_range
 	WHERE restaurant_id = in_restaurant_id;
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL update_restaurant_price_range(3, '2');
+-- CALL update_restaurant_price_range(3, '2');
 -- ------------------------------------------------------------
 
 
@@ -402,13 +433,15 @@ CREATE PROCEDURE
             IN in_address VARCHAR(100)
 	)
 BEGIN
+	START TRANSACTION;
 	UPDATE restaurants
 	SET address = in_address
 	WHERE restaurant_id = in_restaurant_id;
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL update_restaurant_address(3, '21 Huntington Ave');
+-- CALL update_restaurant_address(3, '21 Huntington Ave');
 -- ------------------------------------------------------------
 
 
@@ -422,6 +455,7 @@ CREATE PROCEDURE
         IN in_price FLOAT(5, 2)
 	)
 BEGIN
+	START TRANSACTION;
 	UPDATE menu_contents
 	SET price = in_price
 	WHERE menu_item_id = in_menu_item_id;
@@ -429,10 +463,11 @@ BEGIN
     UPDATE menu_item
     SET item_name = in_name
     WHERE menu_item_id = in_menu_item_id;
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL update_menu_offering(1, 'Fried Egg', 2.00);
+-- CALL update_menu_offering(1, 'Fried Egg', 2.00);
 -- ------------------------------------------------------------
 
 
@@ -446,13 +481,15 @@ CREATE PROCEDURE
             IN in_instructions VARCHAR(60000)
 	)
 BEGIN
+	START TRANSACTION;
 	UPDATE recipe
 	SET instructions = in_instructions
 	WHERE recipe_id = in_recipe_id;
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL update_recipe_instructions(1, 'Toast bread. Place the chicken on the bread with lettuce tomato and pickles.');
+-- CALL update_recipe_instructions(1, 'Toast bread. Place the chicken on the bread with lettuce tomato and pickles.');
 -- ------------------------------------------------------------
 
 
@@ -466,12 +503,14 @@ CREATE PROCEDURE
             IN in_amount INT
 	)
 BEGIN
+	START TRANSACTION;
 	UPDATE ingredient
 	SET amount = in_amount
 	WHERE recipe_id = in_recipe_id
     AND ingredient_name = in_ingredient_name;
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL update_ingredient_amount(1, 'Tomato', 1);
+-- CALL update_ingredient_amount(1, 'Tomato', 1);
 -- ------------------------------------------------------------

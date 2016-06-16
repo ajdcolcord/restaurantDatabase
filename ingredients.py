@@ -165,7 +165,6 @@ def remove_ingredient(conn, ingredient, recipe_id, menu_item_id, menu_id, restau
     view_ingredients(conn, recipe_id, menu_item_id, menu_id, restaurant_id)
 
 
-
 def get_name(ingredient_names):
     """
     Requests for a new valid ingredient amount from the user

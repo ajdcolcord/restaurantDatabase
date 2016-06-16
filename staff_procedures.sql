@@ -7,15 +7,17 @@ DELIMITER $$
 CREATE PROCEDURE 
 	view_restaurant_staff(IN in_restaurant_id INT)
 BEGIN
+	START TRANSACTION;
 	SELECT SSN, staff_name, s.address, phone_number, salary, start_date, role
     FROM staff s
     JOIN restaurants r
     ON s.restaurant_id = r.restaurant_id
     WHERE s.restaurant_id = in_restaurant_id;
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL view_restaurant_staff(1);
+-- CALL view_restaurant_staff(1);
 
 -- ------------------------------------------------------------
 
@@ -42,6 +44,7 @@ CREATE PROCEDURE
         IN in_role VARCHAR(50)
 	)
 BEGIN
+	START TRANSACTION;
 	INSERT INTO staff (SSN, restaurant_id, staff_name, address, phone_number, salary, role)
 	VALUES (
 		in_SSN, 
@@ -52,10 +55,11 @@ BEGIN
 		in_salary, 
 		in_role
 	);
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL add_staff(191900542, 1, 'Jake Bob', '100 Pleasant Street', 1999990129, 12000.62, 'bus');
+-- CALL add_staff(191900542, 1, 'Jake Bob', '100 Pleasant Street', 1999990129, 12000.62, 'bus');
 
 -- ------------------------------------------------------------
 
@@ -69,15 +73,17 @@ CREATE PROCEDURE
         IN in_restaurant_id INT
 	)
 BEGIN
+	START TRANSACTION;
 	INSERT INTO owns (owner_ssn, restaurant_id)
 	VALUES (
 		in_SSN, 
 		in_restaurant_id
 	);
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL add_owner(823461541, 1);
+-- CALL add_owner(823461541, 1);
 
 -- ------------------------------------------------------------
 
@@ -90,15 +96,17 @@ CREATE PROCEDURE
         IN in_employee_SSN INT(9)
 	)
 BEGIN
+	START TRANSACTION;
 	INSERT INTO manages (manager_ssn, employee_ssn)
 	VALUES (
 		in_manager_SSN, 
 		in_employee_SSN
 	);
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL add_manager(823461541, 943467846);
+-- CALL add_manager(823461541, 943467846);
 
 -- ------------------------------------------------------------
 
@@ -112,14 +120,16 @@ DELIMITER $$
 CREATE PROCEDURE 
 	remove_staff(IN in_SSN INT(9), IN in_restaurant_id INT)
 BEGIN
+	START TRANSACTION;
 	DELETE 
     FROM staff
     WHERE SSN = in_SSN
     AND restaurant_id = in_restaurant_id;
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL remove_staff(823920541, 1);
+-- CALL remove_staff(823920541, 1);
 -- ------------------------------------------------------------
 
 -- Remove a manager from all relationships  ---------------
@@ -128,13 +138,15 @@ DELIMITER $$
 CREATE PROCEDURE 
 	remove_manager(IN in_SSN INT(9))
 BEGIN
+	START TRANSACTION;
 	DELETE 
     FROM manages
     WHERE manager_ssn = in_SSN;
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL remove_manager(823461541);
+-- CALL remove_manager(823461541);
 -- ------------------------------------------------------------
 
 -- Remove a manager to employee relationship  ---------------
@@ -143,14 +155,16 @@ DELIMITER $$
 CREATE PROCEDURE 
 	remove_manager_to_employee(IN in_manager_ssn INT(9), IN in_employee_ssn INT(9))
 BEGIN
+	START TRANSACTION;
 	DELETE 
     FROM manages
     WHERE manager_ssn = in_manager_ssn
     AND employee_ssn = in_employee_ssn;
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL remove_manager_to_employee(823461541, 191900542);
+-- CALL remove_manager_to_employee(823461541, 191900542);
 -- ------------------------------------------------------------
 
 
@@ -166,13 +180,15 @@ DELIMITER $$
 CREATE PROCEDURE 
 	update_staff_address(IN in_SSN INT(9), IN in_address VARCHAR(100))
 BEGIN
+	START TRANSACTION;
 	UPDATE staff 
 	SET address = in_address
 	WHERE SSN = in_SSN;
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL update_staff_address(091010541, "900 North Ave");
+-- CALL update_staff_address(091010541, "900 North Ave");
 -- ------------------------------------------------------------
 
 
@@ -182,13 +198,15 @@ DELIMITER $$
 CREATE PROCEDURE 
 	update_staff_salary(IN in_SSN INT(9), IN in_salary FLOAT(8, 2))
 BEGIN
+	START TRANSACTION;
 	UPDATE staff 
 	SET salary = in_salary
 	WHERE SSN = in_SSN;
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL update_staff_salary(091010541, 10000);
+-- CALL update_staff_salary(091010541, 10000);
 -- ------------------------------------------------------------
 
 
@@ -204,7 +222,7 @@ BEGIN
 END$$
 DELIMITER ;
 
-CALL update_staff_phone(091010541, 9567878765);
+-- CALL update_staff_phone(091010541, 9567878765);
 
 -- ------------------------------------------------------------
 
@@ -215,13 +233,15 @@ DELIMITER $$
 CREATE PROCEDURE 
 	update_staff_role(IN in_SSN INT(9), IN in_role VARCHAR(50))
 BEGIN
+	START TRANSACTION;
 	UPDATE staff 
 	SET role = in_role
 	WHERE SSN = in_SSN;
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL update_staff_role(091010541, "dishwasher");
+-- CALL update_staff_role(091010541, "dishwasher");
 -- ------------------------------------------------------------
 
 
@@ -231,13 +251,15 @@ DELIMITER $$
 CREATE PROCEDURE 
 	update_owner(IN in_restaurant_id INT, IN in_SSN INT(9))
 BEGIN
+	START TRANSACTION;
 	UPDATE owns 
 	SET owner_ssn = in_SSN
 	WHERE restaurant_id = in_restaurant_id;
+    COMMIT;
 END$$
 DELIMITER ;
 
-CALL update_owner(1, 091010541);
+-- CALL update_owner(1, 091010541);
 
 
 
