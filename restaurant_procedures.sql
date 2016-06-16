@@ -145,18 +145,16 @@ CREATE PROCEDURE
 	add_restaurant(
 		IN in_restaurant_name VARCHAR(100),
         IN in_address VARCHAR(100),
-        IN in_price_range ENUM('1', '2', '3', '4', '5'),
         IN in_type_name VARCHAR(50)
 	)
 BEGIN
     DECLARE max_restaurant_id INT;
     
     START TRANSACTION;
-	INSERT INTO restaurants (restaurant_name, address, price_range)
+	INSERT INTO restaurants (restaurant_name, address)
 	VALUES (
 		in_restaurant_name, 
-		in_address, 
-		in_price_range
+		in_address
 	);
     
     SET max_restaurant_id = (SELECT MAX(restaurant_id)

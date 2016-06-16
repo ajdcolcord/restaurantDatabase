@@ -60,7 +60,7 @@ def view_restaurant_procedure(conn):
     """
     available_restaurants = get_restaurants(conn)
     show_restaurants(available_restaurants)
-    chosen_restaurant_id = get_restaurant_request(available_restaurants)
+    chosen_restaurant_id = get_restaurant_request(conn, available_restaurants)
     view_restaurant(conn, chosen_restaurant_id)
 
     return chosen_restaurant_id
@@ -105,27 +105,34 @@ def show_restaurants(restaurant_tuples):
     print "------------------------------------------------\n"
 
 
-def get_restaurant_request(restaurant_tuples):
+def get_restaurant_request(conn, restaurant_tuples):
     """
     Gets the restaurant ID request from the user, checks to see if it
     exists in the given array of restaurant tuple (id, name)
     :param restaurant_tuples: Array of (Int, String) - the list of available restaurants in the DB
     :return: Int - the first valid restaurant ID provided by the user
     """
-    restaurant_id = raw_input("Please enter a restaurant ID: ")
+    restaurant_id = raw_input("Please enter a restaurant ID or 0 to add a new restaurant: ")
 
-    chosen_restaurant_id = None
-    while not chosen_restaurant_id:
+    while True:
+
+        print restaurant_id
         try:
-            if int(restaurant_id) in [restaurant[0] for restaurant in restaurant_tuples]:
+            if int(restaurant_id) == 0:
+                add_new_restaurant(conn)
+                return
+            elif int(restaurant_id) in [restaurant[0] for restaurant in restaurant_tuples]:
                 return restaurant_id
-            print "The given restaurant does not exist in the database\n"
-            restaurant_id = raw_input("Please enter a restaurant ID: ")
-        except ValueError:
-            restaurant_id = raw_input("Please enter a restaurant ID: ")
-            continue
+            else:
+                if int(restaurant_id) > 0:
+                    print "The given restaurant does not exist in the database\n"
+                else:
+                    print "Invalid option"
 
-    print chosen_restaurant_id
+
+        except ValueError:
+            restaurant_id = raw_input("Please enter a restaurant ID or 0 to add a new restaurant: ")
+            continue
 
 
 def view_restaurant(conn, restaurant_name):
@@ -159,12 +166,63 @@ def get_view_choice():
     """
     while True:
         try:
-            choice = int(raw_input("Enter 1 to view Staff, 2 to view Menus: "))
+            choice = int(raw_input("Enter 1 to view Staff, 2 to view Menus"))
             if choice in [1, 2]:
                 return choice
         except ValueError:
             continue
 
+
+def add_new_restaurant(conn):
+    """
+    Requests the user for the needed restaurant information to add a new restaurant into the database
+    :param conn: the DB connection
+    :return: Void - modifies the database
+    """
+    cursor = conn.raw_connection().cursor()
+    cursor.callproc("add_restaurant", [get_name(), get_address(), get_type()])
+    cursor.close()
+
+    view_restaurant_procedure(conn)
+
+
+def get_name():
+    """
+    Requests for a new restaurant name from the user
+    :return: String - the new restaurant name
+    """
+    while True:
+        try:
+            name = raw_input("Enter the new restaurant name: ")
+            return name
+        except ValueError:
+            continue
+
+
+def get_address():
+    """
+    Requests for a new restaurant address from the user
+    :return: String - the new restaurant address
+    """
+    while True:
+        try:
+            name = raw_input("Enter the new restaurant address: ")
+            return name
+        except ValueError:
+            continue
+
+
+def get_type():
+    """
+    Requests for a new restaurant type from the user
+    :return: String - the new restaurant type
+    """
+    while True:
+        try:
+            name = raw_input("Enter the new restaurant type: ")
+            return name
+        except ValueError:
+            continue
 
 def close(conn):
     """

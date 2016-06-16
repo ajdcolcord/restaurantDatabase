@@ -145,6 +145,7 @@ def get_recipe_action_choice():
         except ValueError:
             continue
 
+
 def get_name():
     """
     Requests for a new recipe name from the user
