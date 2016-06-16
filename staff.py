@@ -207,7 +207,7 @@ def get_SSN(all_staff_SSN):
     """
     while True:
         try:
-            SSN = int(raw_input("Enter the new staff SSN: "))
+            SSN = int(raw_input("Enter the staff SSN: "))
             if SSN not in all_staff_SSN:
                 if len(str(SSN)) == 9:
                     return SSN

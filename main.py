@@ -2,6 +2,7 @@
 from sqlalchemy import create_engine
 from staff import view_restaurant_staff
 from restaurant_menus import view_restaurant_menus
+from staff import get_SSN
 
 
 def main():
@@ -76,8 +77,10 @@ def execute_restaurant_options(conn, chosen_restaurant_id):
     view_choice = get_view_choice()
     if view_choice == 1:
         view_restaurant_staff(conn, chosen_restaurant_id)
-    else:
+    elif view_choice == 2:
         view_restaurant_menus(conn, chosen_restaurant_id)
+    else:
+        add_restaurant_owner(conn, chosen_restaurant_id)
 
 
 def get_restaurants(conn):
@@ -166,8 +169,8 @@ def get_view_choice():
     """
     while True:
         try:
-            choice = int(raw_input("Enter 1 to view Staff, 2 to view Menus"))
-            if choice in [1, 2]:
+            choice = int(raw_input("Enter 1 to view Staff, 2 to view Menus, or 0 to add an owner"))
+            if choice in [1, 2, 0]:
                 return choice
         except ValueError:
             continue
@@ -223,6 +226,28 @@ def get_type():
             return name
         except ValueError:
             continue
+
+
+def add_restaurant_owner(conn, restaurant_id):
+    """
+    Runs the procedures necessary for the user to add a restaurant owner to the given restaurant ID
+    :param conn: the DB connection
+    :param restaurant_id: the restaurant to add the owner to
+    :return: Void
+    """
+
+    while True:
+        try:
+            # TODO: CHECK HERE IF SSN EXISTS FIRST
+            cursor = conn.raw_connection().cursor()
+            cursor.callproc("add_owner", [int(get_SSN([])), int(restaurant_id)])
+            cursor.close()
+            break
+        except:
+            continue
+
+    view_restaurant_procedure(conn)
+
 
 def close(conn):
     """
