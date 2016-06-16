@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import menu_item
 
+
 def view_ingredients(conn, recipe_id, menu_item_id, menu_id, restaurant_id):
     """
     View information on the specific menu item ID of the given menu ID by calling the view_recipe procedure
@@ -66,7 +67,7 @@ def choose_next_option(conn, recipe_id, ingredients, menu_item_id, menu_id, rest
 
 def remove_recipe(conn, recipe_id, menu_item_id, menu_id, restaurant_id):
     """
-    Calls the remove_staff procedure
+    Calls the remove_recipe procedure
     :param conn: the DB connection
     :param recipe_id: Int - the recipe ID to remove
     :param menu_item_id: Int - the menu item ID to remove
@@ -77,8 +78,8 @@ def remove_recipe(conn, recipe_id, menu_item_id, menu_id, restaurant_id):
     cursor = conn.raw_connection().cursor()
     cursor.callproc("remove_recipe", [int(recipe_id)])
     cursor.close()
-    print "HERE"
-    menu_item.view_menu_item(conn, menu_item_id, menu_id, restaurant_id)
+    print "HERE - menu_item_id: " + str(menu_item_id) + " menu_id: " + str(menu_id) + " restaurant_id: " + str(restaurant_id)
+    menu_item.view_item_recipes(conn, menu_item_id, menu_id, restaurant_id)
 
 
 def add_ingredient(conn, recipe_id, ingredients, menu_item_id, menu_id, restaurant_id):
@@ -188,8 +189,8 @@ def get_amount():
     """
     while True:
         try:
-            price = int(raw_input("Enter the new ingredient amount: "))
-            if price > 0:
-                return price
+            amount = int(raw_input("Enter the new ingredient amount: "))
+            if amount > 0:
+                return amount
         except ValueError:
             continue

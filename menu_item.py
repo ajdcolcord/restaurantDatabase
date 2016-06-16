@@ -3,7 +3,7 @@ import menu
 from ingredients import view_ingredients
 
 
-def view_menu_item(conn, menu_item_id, menu_id, restaurant_id):
+def view_item_recipes(conn, menu_item_id, menu_id, restaurant_id):
     """
     View information on the specific menu item ID of the given menu ID by calling the view_recipe procedure
     :param conn: DB Connection Engine
@@ -16,7 +16,7 @@ def view_menu_item(conn, menu_item_id, menu_id, restaurant_id):
     cursor.callproc("view_recipe", [menu_item_id])
     results = list(cursor.fetchall())
     print "------------------------------------------------"
-    print "Menu Item " + str(menu_item_id)
+    print "Recipe of Menu Item: " + str(menu_item_id)
     all_recipe_ids = []
     for (recipe_id, recipe_name, instructions) in results:
         all_recipe_ids.append(recipe_id)
@@ -48,17 +48,51 @@ def choose_next_option(conn, menu_item_id, all_recipe_ids, menu_id, restaurant_i
     while True:
         try:
             recipe_action_choice = int(
-                raw_input("Enter a recipe ID to view it's ingredients, 0 to Add a New recipe, or -1 to delete this menu item"))
+                raw_input("Enter a recipe ID to modify it or view it's ingredients, 0 to Add a New recipe, or -1 to delete this menu item"))
             if recipe_action_choice == -1:
                 remove_menu_item(conn, menu_item_id, menu_id, restaurant_id)
             elif recipe_action_choice == 0:
                 add_recipe(conn, menu_item_id, menu_id, restaurant_id)
             elif recipe_action_choice in all_recipe_ids:
-                view_ingredients(conn, recipe_action_choice, recipe_action_choice, menu_id, restaurant_id)
+                recipe_action(conn, recipe_action_choice, menu_item_id, menu_id, restaurant_id)
             else:
                 print "Invalid option"
         except ValueError:
             continue
+
+
+def recipe_action(conn, recipe_id, menu_item_id, menu_id, restaurant_id):
+    """
+    Requests the next action to take - either modify the recipe instructions or view ingreduents
+    :param conn: the DB connection
+    :param recipe_id: the ID of the recipe
+    :param menu_item_id: the ID of the menu item selected
+    :param menu_id: the ID of the menu that the current menu_item is in
+    :param restaurant_id: the ID of the restaurant that the current menu is contained
+    :return: Void
+    """
+    if get_recipe_action_choice() == 0:
+        modify_recipe_instructions(conn, recipe_id, menu_item_id, menu_id, restaurant_id)
+    else:
+        view_ingredients(conn, recipe_id, menu_item_id, menu_id, restaurant_id)
+
+
+def modify_recipe_instructions(conn, recipe_id, menu_item_id, menu_id, restaurant_id):
+    """
+    Requests for the new instructions from the user, then updates the instructions for recipe at recipe_id
+    :param conn: the DB connection
+    :param recipe_id: the ID of the recipe
+    :param menu_item_id: the ID of the menu item selected
+    :param menu_id: the ID of the menu that the current menu_item is in
+    :param restaurant_id: the ID of the restaurant that the current menu is contained
+    :return: Void
+    """
+
+    cursor = conn.raw_connection().cursor()
+    cursor.callproc("update_recipe_instructions", [int(recipe_id), str(get_instructions())])
+    cursor.close()
+
+    view_item_recipes(conn, menu_item_id, menu_id, restaurant_id)
 
 
 def remove_menu_item(conn, menu_item_id, menu_id, restaurant_id):
@@ -95,8 +129,21 @@ def add_recipe(conn, menu_item_id, menu_id, restaurant_id):
                     ])
     cursor.close()
 
-    view_menu_item(conn, menu_item_id, menu_id, restaurant_id)
+    view_item_recipes(conn, menu_item_id, menu_id, restaurant_id)
 
+
+def get_recipe_action_choice():
+    """
+    Requests for a new choice to take on the menu item's recipe, either update it's instructions or view ingredients
+    :return: Int - (0 to modify it's instructions, 1 to view its ingredients)
+    """
+    while True:
+        try:
+            choice = int(raw_input("Enter 0 to modify this recipe's instructions, or 1 to view its ingredients: "))
+            if choice in [0, 1]:
+                return choice
+        except ValueError:
+            continue
 
 def get_name():
     """
