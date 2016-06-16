@@ -88,7 +88,7 @@ DELIMITER $$
 CREATE PROCEDURE 
 	view_recipe(IN in_menu_item_id INT)
 BEGIN
-	SELECT recipe_name, instructions
+	SELECT r.recipe_id, recipe_name, instructions
     FROM recipe r
     LEFT JOIN menu_item mi
     ON r.menu_item_id = mi.menu_item_id
